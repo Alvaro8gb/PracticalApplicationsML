@@ -15,6 +15,9 @@ from skrebate import ReliefF
 
 from globals import SEED, TRAIN_SIZE, VALID_SIZE, TEST_SIZE, SCORE_METRIC, K_FOLD
 
+from sklearn.preprocessing import StandardScaler
+
+
 class ResultGridSearch(BaseModel):
     best_model: object
     best_num_features: int
@@ -225,9 +228,9 @@ def format_result(result: list):
 
 def eval_model(y_true, y_pred, y_prob=None):
     brier_score = None
-    precision = precision_score(y_true, y_pred)
-    recall = recall_score(y_true, y_pred)
-    f1 = f1_score(y_true, y_pred)
+    precision = precision_score(y_true, y_pred, average="weighted")
+    recall = recall_score(y_true, y_pred, average="weighted")
+    f1 = f1_score(y_true, y_pred, average="binary")
 
     print("Métricas de evaluación:")
     print(f"Precision: {precision:.4f}")
@@ -239,6 +242,7 @@ def eval_model(y_true, y_pred, y_prob=None):
         print(f"Brier Score: {brier_score:.4f}")
 
     return f1, brier_score
+
 
 def pipline_evaluation(x: np.ndarray, y: np.ndarray, model, param_grid: dict, scoring=SCORE_METRIC):
     f1_score = []
@@ -278,6 +282,7 @@ def pipline_evaluation(x: np.ndarray, y: np.ndarray, model, param_grid: dict, sc
 
     return r"${}$ & ${}$ &".format(format_result(f1_score), format_result(brie_score))
 
+
 def wrapper_ds(x: pd.DataFrame, y: np.ndarray, model, n_features):
     sfs = SequentialFeatureSelector(estimator=model, n_features_to_select=n_features, scoring=SCORE_METRIC,
                                     direction="backward", cv=K_FOLD, n_jobs=-1)
@@ -314,3 +319,12 @@ def show_data(X, y: np.ndarray):
     plt.title('2D Visualization of Data with Predicted Classes (PCA)')
     plt.legend()
     plt.show()
+
+
+def normalize(X):
+    scaler = StandardScaler()
+    scaler.fit(X)
+    scaled_data = scaler.transform(X)
+    scaled_df = pd.DataFrame(scaled_data, index=X.index, columns=X.columns)
+
+    return scaled_df

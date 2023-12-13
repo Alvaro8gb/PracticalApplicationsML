@@ -6,3 +6,5 @@ TEST_SIZE = 0.3
 K_FOLD = 5
 SCORE_METRIC = "f1"
 GRID_N_FEATURES = [10,15,20]
+TARGET = "Status"
+
