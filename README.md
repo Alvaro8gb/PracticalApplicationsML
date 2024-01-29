@@ -49,3 +49,7 @@ img
 │   │       └── ward_tree.png
 
 ```
+
+## Reports 
+
+The reports of each practical aplication is located in [ref](./reports/)
